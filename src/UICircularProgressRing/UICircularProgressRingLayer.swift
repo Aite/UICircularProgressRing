@@ -45,6 +45,7 @@ private extension UILabel {
             valueAttributes: [NSAttributedStringKey: Any]?,
             valueIndicator: String,
             indicatorAttributes: [NSAttributedStringKey: Any]?,
+            inNewLine: Bool,
             rightToLeft: Bool,
             showsDecimal: Bool,
             decimalPlaces: Int,
@@ -62,7 +63,12 @@ private extension UILabel {
         let indicatorAttributedText = NSAttributedString(string: valueIndicator, attributes: indicatorAttributes)
 
         let attributedTextString = NSMutableAttributedString(string: "")
-        if rightToLeft {
+        if inNewLine {
+            attributedTextString.append(valueAttributedText)
+            attributedTextString.append(NSAttributedString(string: "\n", attributes: nil))
+            attributedTextString.append(indicatorAttributedText)
+        }
+        else if rightToLeft {
             attributedTextString.append(indicatorAttributedText)
             attributedTextString.append(valueAttributedText)
         }
@@ -74,7 +80,7 @@ private extension UILabel {
         attributedText = attributedTextString
 
         valueDelegate?.willDisplayLabel(label: self)
-        self.sizeToFit()
+        sizeToFit()
     }
 }
 
@@ -439,18 +445,29 @@ class UICircularProgressRingLayer: CAShapeLayer {
         valueLabel.textAlignment = .center
         valueLabel.textColor = fontColor
 
+        let textBound : CGRect
+        if valueIndicatorInNewLine {
+            valueLabel.numberOfLines = 2
+            textBound = bounds.insetBy(dx: bounds.width / 7, dy: 0)
+        }
+        else {
+            valueLabel.numberOfLines = 1
+            textBound = bounds
+        }
+
         valueLabel.update(withValue: value,
                           valueAttributes: valueTextAttributes,
                           valueIndicator: valueIndicator,
                           indicatorAttributes: indicatorTextAttributes,
+                          inNewLine: valueIndicatorInNewLine,
                           rightToLeft: rightToLeft,
                           showsDecimal: showFloatingPoint,
                           decimalPlaces: decimalPlaces,
                           valueDelegate: valueDelegate)
 
         // Deterime what should be the center for the label
-        valueLabel.center = CGPoint(x: bounds.midX, y: bounds.midY)
+        valueLabel.center = CGPoint(x: textBound.midX, y: textBound.midY)
 
-        valueLabel.drawText(in: bounds)
+        valueLabel.drawText(in: textBound)
     }
 }
