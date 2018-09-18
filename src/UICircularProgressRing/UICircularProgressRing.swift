@@ -779,7 +779,7 @@ fileprivate extension CALayer {
      ## Author
      Aite
      */
-    @IBInspectable open var indicatorTextAttributes: [NSAttributedStringKey: Any]? {
+    @IBInspectable open var indicatorTextAttributes: [NSAttributedString.Key: Any]? {
         didSet{
             ringLayer.indicatorTextAttributes = self.indicatorTextAttributes
         }
@@ -795,7 +795,7 @@ fileprivate extension CALayer {
      ## Author
      Aite
      */
-    @IBInspectable open var valueTextAttributes: [NSAttributedStringKey: Any]? {
+    @IBInspectable open var valueTextAttributes: [NSAttributedString.Key: Any]? {
         didSet{
             ringLayer.valueTextAttributes = self.valueTextAttributes
         }
@@ -886,7 +886,7 @@ fileprivate extension CALayer {
      ## Author
      Luis Padron
      */
-    @objc open var animationStyle: String = kCAMediaTimingFunctionEaseIn {
+    @objc open var animationStyle: String = convertFromCAMediaTimingFunctionName(CAMediaTimingFunctionName.easeIn) {
         didSet {
             ringLayer.animationStyle = animationStyle
         }
@@ -1056,12 +1056,12 @@ fileprivate extension CALayer {
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(restoreProgress),
-                                               name: .UIApplicationWillEnterForeground,
+                                               name: UIApplication.willEnterForegroundNotification,
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(snapshotProgress),
-                                               name: .UIApplicationWillResignActive,
+                                               name: UIApplication.willResignActiveNotification,
                                                object: nil)
     }
 
@@ -1316,4 +1316,9 @@ extension UICircularProgressRing {
         guard let animation = snapshottedAnimation else { return }
         ringLayer.add(animation, forKey: AnimationKeys.value.rawValue)
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromCAMediaTimingFunctionName(_ input: CAMediaTimingFunctionName) -> String {
+	return input.rawValue
 }
